@@ -15,6 +15,7 @@ class AopTest {
 
 	@Test
 	void test1(){
+		// 创建 IOC 容器
 		final AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
 		final B bean = ac.getBean(B.class);
 		bean.test1();
