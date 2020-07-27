@@ -55,6 +55,8 @@ public abstract class AbstractResource implements Resource {
 	@Override
 	public boolean exists() {
 		// Try file existence: can we find the file in the file system?
+
+		// 先判断文件 file 是否存在
 		if (isFile()) {
 			try {
 				return getFile().exists();
@@ -67,6 +69,7 @@ public abstract class AbstractResource implements Resource {
 			}
 		}
 		// Fall back to stream existence: can we open the stream?
+		// 其次查看是否是可以打开的流
 		try {
 			getInputStream().close();
 			return true;
@@ -98,6 +101,9 @@ public abstract class AbstractResource implements Resource {
 	}
 
 	/**
+	 * 默认false ， 交给子类重写
+	 */
+	/**
 	 * This implementation always returns {@code false}.
 	 */
 	@Override
@@ -105,6 +111,9 @@ public abstract class AbstractResource implements Resource {
 		return false;
 	}
 
+	/**
+	 * 直接抛出异常，子类实现
+	 */
 	/**
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that the resource cannot be resolved to a URL.
@@ -114,6 +123,9 @@ public abstract class AbstractResource implements Resource {
 		throw new FileNotFoundException(getDescription() + " cannot be resolved to URL");
 	}
 
+	/**
+	 * 根据 getURL()的方法返会的 URL 构建 URI
+	 */
 	/**
 	 * This implementation builds a URI based on the URL returned
 	 * by {@link #getURL()}.
@@ -129,6 +141,9 @@ public abstract class AbstractResource implements Resource {
 		}
 	}
 
+	/**
+	 * 子类实现
+	 */
 	/**
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that the resource cannot be resolved to an absolute file path.
@@ -149,6 +164,9 @@ public abstract class AbstractResource implements Resource {
 		return Channels.newChannel(getInputStream());
 	}
 
+	/**
+	 * 全部读取获取长度
+	 */
 	/**
 	 * This method reads the entire InputStream to determine the content length.
 	 * <p>For a custom sub-class of {@code InputStreamResource}, we strongly
@@ -190,6 +208,7 @@ public abstract class AbstractResource implements Resource {
 	@Override
 	public long lastModified() throws IOException {
 		File fileToCheck = getFileForLastModifiedCheck();
+		// 调用 File 类的 lastModified()方法
 		long lastModified = fileToCheck.lastModified();
 		if (lastModified == 0L && !fileToCheck.exists()) {
 			throw new FileNotFoundException(getDescription() +
@@ -210,6 +229,9 @@ public abstract class AbstractResource implements Resource {
 		return getFile();
 	}
 
+	/**
+	 * 子类重写
+	 */
 	/**
 	 * This implementation throws a FileNotFoundException, assuming
 	 * that relative resources cannot be created for this resource.

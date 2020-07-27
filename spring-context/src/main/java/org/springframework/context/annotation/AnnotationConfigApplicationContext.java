@@ -64,8 +64,9 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext() {
 		//AnnotatedBeanDefinitionReader是一个读取注解的Bean读取器，这里将this传了进去。
+		//会注册配置类的后置处理器
 		this.reader = new AnnotatedBeanDefinitionReader(this);
-		//扫描注解真正的核心再此
+		//扫描注解真正的核心再此，会注册一些默认的过滤器
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -86,8 +87,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		// 调用默认无参构造器
 		this();
+		//注册配置类
 		register(componentClasses);
+		// 容器初始化的全过程
 		refresh();
 	}
 
