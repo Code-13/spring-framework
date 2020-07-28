@@ -267,6 +267,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 			throw new IllegalStateException(
 					"GenericApplicationContext does not support multiple refresh attempts: just call 'refresh' once");
 		}
+		// 为 Bean工厂设置一个序列化Id
 		this.beanFactory.setSerializationId(getId());
 	}
 

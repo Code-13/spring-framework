@@ -245,11 +245,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly)
 			throws BeansException {
 
+		// 转换 Bean 的名称
 		String beanName = transformedBeanName(name);
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.
+		// 从已经实例化好的缓存中获取单例bean，因为我们此前可能已经将其实例化了
 		Object sharedInstance = getSingleton(beanName);
+		// 如果缓存中可以拿到，说明已经实例化过了
 		if (sharedInstance != null && args == null) {
 			if (logger.isTraceEnabled()) {
 				if (isSingletonCurrentlyInCreation(beanName)) {
