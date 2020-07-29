@@ -145,12 +145,17 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 				});
 			}
 			else {
+				//设置 factoryMethod 可访问
 				ReflectionUtils.makeAccessible(factoryMethod);
 			}
 
+			//获取前面存在的线程本地的FactoryMethod
 			Method priorInvokedFactoryMethod = currentlyInvokedFactoryMethod.get();
+
 			try {
+				//设置新的
 				currentlyInvokedFactoryMethod.set(factoryMethod);
+				//调用工厂方法
 				Object result = factoryMethod.invoke(factoryBean, args);
 				if (result == null) {
 					result = new NullBean();
@@ -159,9 +164,11 @@ public class SimpleInstantiationStrategy implements InstantiationStrategy {
 			}
 			finally {
 				if (priorInvokedFactoryMethod != null) {
+					//如果线程本地存在，就设置回老的
 					currentlyInvokedFactoryMethod.set(priorInvokedFactoryMethod);
 				}
 				else {
+					//否则就删除，等于没设置
 					currentlyInvokedFactoryMethod.remove();
 				}
 			}

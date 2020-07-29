@@ -269,6 +269,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			//原型的循环引用报错
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
@@ -296,13 +297,19 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
+				// 将Bean标记为已经创建
 				markBeanAsCreated(beanName);
 			}
 
 			try {
+				// 获取合并过的BeanDefinition, BeanDefinition.getParentName如果不为null，需要先获取，然后合并BeanDefinition
 				RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
+				// 检查合并过的BeanDefinition
 				checkMergedBeanDefinition(mbd, beanName, args);
 
+				/**
+				 * 先查看 bean 有没有依赖项，有就先创建依赖项
+				 */
 				// Guarantee initialization of beans that the current bean depends on.
 				String[] dependsOn = mbd.getDependsOn();
 				if (dependsOn != null) {
@@ -324,6 +331,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				// Create bean instance.
 				if (mbd.isSingleton()) {
+					// 单例创建
 					sharedInstance = getSingleton(beanName, () -> {
 						try {
 							return createBean(beanName, mbd, args);
@@ -1348,7 +1356,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			throws BeanDefinitionStoreException {
 
 		synchronized (this.mergedBeanDefinitions) {
+
+			// 准备一个RootBeanDefinition变量引用，用于记录要构建和最终要返回的BeanDefinition，
+			// 这里根据上下文不难猜测 mbd 应该就是 mergedBeanDefinition 的缩写。
 			RootBeanDefinition mbd = null;
+
+
 			RootBeanDefinition previous = null;
 
 			// Check with full lock now in order to enforce the same merged instance.
@@ -1359,6 +1372,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			if (mbd == null || mbd.stale) {
 				previous = mbd;
 				if (bd.getParentName() == null) {
+
+					/**
+					 * bd不是一个ChildBeanDefinition的情况,换句话讲，这 bd应该是 :
+					 * 1. 一个独立的 GenericBeanDefinition 实例，parentName 属性为null
+					 * 2. 或者是一个 RootBeanDefinition 实例，parentName 属性为null
+					 * 此时mbd直接使用一个bd的复制品
+					 */
+
 					// Use copy of given root bean definition.
 					if (bd instanceof RootBeanDefinition) {
 						mbd = ((RootBeanDefinition) bd).cloneBeanDefinition();
@@ -1368,6 +1389,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					}
 				}
 				else {
+
+					/**
+					 * bd是一个ChildBeanDefinition的情况,这种情况下，需要将bd和其parent bean definition 合并到一起，形成最终的 mbd
+					 * 面是获取bd的 parent bean definition 的过程，最终结果记录到 pbd，
+					 *
+					 * 并且可以看到该过程中递归使用了getMergedBeanDefinition(), 为什么呢?因为 bd 的 parent bd 可能也是个ChildBeanDefinition，所以该过程需要递归处理
+					 */
+
 					// Child bean definition: needs to be merged with parent.
 					BeanDefinition pbd;
 					try {
@@ -1391,6 +1420,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						throw new BeanDefinitionStoreException(bd.getResourceDescription(), beanName,
 								"Could not resolve parent bean definition '" + bd.getParentName() + "'", ex);
 					}
+
+					/**
+					 * 现在已经获取 bd 的 parent bd 到 pbd，这个 pbd 也是已经合并过的
+					 * 这里使用pbd创建最终的mbd，然后再使用bd覆盖一次，这样就相当于mbd来自两个BeanDefinition:当前 BeanDefinition 及其合并的("Merged")双亲 BeanDefinition,
+					 * 然后mbd就是针对当前bd的一个MergedBeanDefinition(合并的BeanDefinition)了。
+					 */
+
 					// Deep copy with overridden values.
 					mbd = new RootBeanDefinition(pbd);
 					mbd.overrideFrom(bd);
@@ -1448,7 +1484,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void checkMergedBeanDefinition(RootBeanDefinition mbd, String beanName, @Nullable Object[] args)
 			throws BeanDefinitionStoreException {
-
+		// 就检查了是不是抽象的，如果是抛出异常
 		if (mbd.isAbstract()) {
 			throw new BeanIsAbstractException(beanName);
 		}

@@ -914,6 +914,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 				// 当前 bean 是不是 工厂方法
 				if (isFactoryBean(beanName)) {
+					// 拿到工厂方法
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
@@ -928,7 +929,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
 						if (isEagerInit) {
-							// 判断 工厂方法 需不需要马上初始化，如果是 getBean
+							// 判断 工厂方法 需不需要马上初始化 bean，如果是，就立即 getBean
 							getBean(beanName);
 						}
 					}
