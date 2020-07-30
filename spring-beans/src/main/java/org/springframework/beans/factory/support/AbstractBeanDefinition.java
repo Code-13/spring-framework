@@ -60,11 +60,17 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		implements BeanDefinition, Cloneable {
 
 	/**
+	 * 默认生命周期，如果有父容器，就跟随父容器的生命周期；如果没有父容器，就是单例声明周期。
+	 */
+	/**
 	 * Constant for the default scope name: {@code ""}, equivalent to singleton
 	 * status unless overridden from a parent bean definition (if applicable).
 	 */
 	public static final String SCOPE_DEFAULT = "";
 
+	/**
+	 * 不自动注入属性
+	 */
 	/**
 	 * Constant that indicates no external autowiring at all.
 	 * @see #setAutowireMode
@@ -72,17 +78,28 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final int AUTOWIRE_NO = AutowireCapableBeanFactory.AUTOWIRE_NO;
 
 	/**
+	 * 通过名称自动注入属性
+	 */
+	/**
 	 * Constant that indicates autowiring bean properties by name.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_BY_NAME = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;
 
 	/**
+	 * 通过类型自动注入属性
+	 */
+	/**
 	 * Constant that indicates autowiring bean properties by type.
 	 * @see #setAutowireMode
 	 */
 	public static final int AUTOWIRE_BY_TYPE = AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE;
 
+	/**
+	 * 此 Bean 的实例在构建时采用构造函数注入。
+	 * 【当然，这里只是说使用构造函数，并通过构造函数带进去一些东西。构造出实例后还是可以通过 上面的配置来进行
+	 *  根据 命名/类型 继续进行属性注入】
+	 */
 	/**
 	 * Constant that indicates autowiring a constructor.
 	 * @see #setAutowireMode
@@ -100,17 +117,26 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final int AUTOWIRE_AUTODETECT = AutowireCapableBeanFactory.AUTOWIRE_AUTODETECT;
 
 	/**
+	 * 构建此 Bean 的实例时不进行任何依赖检测
+	 */
+	/**
 	 * Constant that indicates no dependency check at all.
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_NONE = 0;
 
 	/**
+	 * 构建此 Bean 的实例时只检测对象依赖【复杂依赖】
+	 */
+	/**
 	 * Constant that indicates dependency checking for object references.
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_OBJECTS = 1;
 
+	/**
+	 * 构建此 Bean 的实例时只检测常用类型依赖【简单依赖】
+	 */
 	/**
 	 * Constant that indicates dependency checking for "simple" properties.
 	 * @see #setDependencyCheck
@@ -119,12 +145,21 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	public static final int DEPENDENCY_CHECK_SIMPLE = 2;
 
 	/**
+	 * 构建此 Bean 的实例时检测所有依赖
+	 */
+	/**
 	 * Constant that indicates dependency checking for all properties
 	 * (object references as well as "simple" properties).
 	 * @see #setDependencyCheck
 	 */
 	public static final int DEPENDENCY_CHECK_ALL = 3;
 
+	/**
+	 * 一个常量，在记录 Bean 的销毁要调用的方法时如果设置成这个值就表明这不是个具体的方法名。方法名称需要
+	 * 自行推断。
+	 *
+	 * 【这个常量的值设置成这样是为了保证不会有某些很变态的方法命名和这个常量的值冲突了】
+	 */
 	/**
 	 * Constant that indicates the container should attempt to infer the
 	 * {@link #setDestroyMethodName destroy method name} for a bean as opposed to
@@ -149,8 +184,14 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private Boolean lazyInit;
 
+	/**
+	 * 指明对此 Bean 中的依赖属性如何寻找到对应的值
+	 **/
 	private int autowireMode = AUTOWIRE_NO;
 
+	/**
+	 * 配置是否对此 Bean 中配置的依赖进行检测
+	 **/
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
 	@Nullable
@@ -160,13 +201,27 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	private boolean primary = false;
 
+	/**
+	 * 存储此 BD 的 Qualifier 值。这个有点像是别名的，可以在声明 Bean 时写上 n 个，在要用时，通过
+	 * 使用 Qualifier 进行限制。
+	 **/
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+	/**
+	 * 用来记录生成此 Bean 实例的一个工厂方法引用【算是最直白最爽的一种实例化方法了】
+	 **/
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
+	/**
+	 * 设置是否允许通过特殊手段接触 Bean 的 Class 中的非公有方法【个人感觉主要是在配置实例化 Bean 时找构造
+	 * 函数时的一些策略用吧】
+	 **/
 	private boolean nonPublicAccessAllowed = true;
 
+	/**
+	 * 在配置实例化 Bean 时找构造函数时是否采用宽松策略策略用吧
+	 **/
 	private boolean lenientConstructorResolution = true;
 
 	@Nullable
@@ -181,18 +236,34 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+	/**
+	 * 用来保存在 BeanDefinition 配置中的一些方法覆盖的设置
+	 **/
 	private MethodOverrides methodOverrides = new MethodOverrides();
 
 	@Nullable
 	private String initMethodName;
 
+	/**
+	 * 配置当要销毁实例 Bean 时要调用的方法
+	 **/
 	@Nullable
 	private String destroyMethodName;
 
+	/**
+	 * 指明配置的初始化方法是不是默认的那个【？？？？】【可能是为了简化逻辑提供的一个标记量？】
+	 **/
 	private boolean enforceInitMethod = true;
 
+	/**
+	 * 指明配置的销毁方法是不是默认的那个【？？？？】【可能是为了简化逻辑提供的一个标记量？】
+	 **/
 	private boolean enforceDestroyMethod = true;
 
+	/**
+	 * 指明此 BD 是否是合成的
+	 *【合成的 = 用户自己定义的 = 不是应用程序定义的 = 不用执行一些后处理器钩子？？？】【最后一点不确定】
+	 **/
 	private boolean synthetic = false;
 
 	private int role = BeanDefinition.ROLE_APPLICATION;

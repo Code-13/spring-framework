@@ -28,6 +28,10 @@ import org.springframework.lang.Nullable;
 public interface BeanMetadataElement {
 
 	/**
+	 * 首先我们要能获得源数据，也就是这个bean是来自哪个对象的，我们就可以获得一些相关的信息。
+	 */
+
+	/**
 	 * Return the configuration source {@code Object} for this metadata element
 	 * (may be {@code null}).
 	 */

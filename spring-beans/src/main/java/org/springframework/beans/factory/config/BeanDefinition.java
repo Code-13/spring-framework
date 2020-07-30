@@ -46,6 +46,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_SINGLETON
 	 */
+	/**
+	 * 单例
+	 */
 	String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
 
 	/**
@@ -54,12 +57,18 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #setScope
 	 * @see ConfigurableBeanFactory#SCOPE_PROTOTYPE
 	 */
+	/**
+	 * 原型
+	 */
 	String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 
 	/**
 	 * Role hint indicating that a {@code BeanDefinition} is a major part
 	 * of the application. Typically corresponds to a user-defined bean.
+	 */
+	/**
+	 * 角色提示。表明这个 BD 是应用中的关键角色。这个角色通常对应用户定义的 Bean
 	 */
 	int ROLE_APPLICATION = 0;
 
@@ -72,6 +81,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * {@link org.springframework.beans.factory.parsing.ComponentDefinition},
 	 * but not when looking at the overall configuration of an application.
 	 */
+	/**
+	 * 角色提示，表明 BD 是一些大型配置的支撑角色。通常是一些外部框架的支撑 bean 。在梳理整体应用配置时一般不关心它，但是在仔细查看特定框架实现时应该注意研读
+	 */
 	int ROLE_SUPPORT = 1;
 
 	/**
@@ -79,6 +91,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * entirely background role and has no relevance to the end-user. This hint is
 	 * used when registering beans that are completely part of the internal workings
 	 * of a {@link org.springframework.beans.factory.parsing.ComponentDefinition}.
+	 */
+	/**
+	 * 角色提示，表示 BD 完全是一个后台服务，不会和使用者直接接触。在注册完全在 ComponentDefinition 内部工作的 BD 时会用这个
 	 */
 	int ROLE_INFRASTRUCTURE = 2;
 
@@ -104,6 +119,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #setFactoryBeanName
 	 * @see #setFactoryMethodName
 	 */
+	/**
+	 * 设置bean类名字,这个可能会在后置处理器中修改，比如用了 GCLIB 代理配置类的时候就会改
+	 */
 	void setBeanClassName(@Nullable String beanClassName);
 
 	/**
@@ -126,6 +144,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * @see #SCOPE_SINGLETON
 	 * @see #SCOPE_PROTOTYPE
 	 */
+	/**
+	 * 设置范围，是单例，还是原型
+	 */
 	void setScope(@Nullable String scope);
 
 	/**
@@ -140,6 +161,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * <p>If {@code false}, the bean will get instantiated on startup by bean
 	 * factories that perform eager initialization of singletons.
 	 */
+	/**
+	 * 设置是否是懒加载
+	 */
 	void setLazyInit(boolean lazyInit);
 
 	/**
@@ -151,6 +175,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Set the names of the beans that this bean depends on being initialized.
 	 * The bean factory will guarantee that these beans get initialized first.
+	 */
+	/**
+	 * 设置需要先加载的依赖的类名字数组
 	 */
 	void setDependsOn(@Nullable String... dependsOn);
 
@@ -166,6 +193,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * It does not affect explicit references by name, which will get resolved even
 	 * if the specified bean is not marked as an autowire candidate. As a consequence,
 	 * autowiring by name will nevertheless inject a bean if the name matches.
+	 */
+	/**
+	 * 设置是否适合给其他类做自动装配
 	 */
 	void setAutowireCandidate(boolean autowireCandidate);
 
@@ -184,12 +214,18 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Return whether this bean is a primary autowire candidate.
 	 */
+	/**
+	 * 设置是否优先自动装配
+	 */
 	boolean isPrimary();
 
 	/**
 	 * Specify the factory bean to use, if any.
 	 * This the name of the bean to call the specified factory method on.
 	 * @see #setFactoryMethodName
+	 */
+	/**
+	 * 设置FactoryBean的名字
 	 */
 	void setFactoryBeanName(@Nullable String factoryBeanName);
 
@@ -220,6 +256,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the ConstructorArgumentValues object (never {@code null})
 	 */
+	/**
+	 * 获取构造函数的参数
+	 */
 	ConstructorArgumentValues getConstructorArgumentValues();
 
 	/**
@@ -249,6 +288,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Set the name of the initializer method.
 	 * @since 5.1
 	 */
+	/**
+	 * 设置初始化方法 对应@PostConstruct
+	 */
 	void setInitMethodName(@Nullable String initMethodName);
 
 	/**
@@ -261,6 +303,9 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	/**
 	 * Set the name of the destroy method.
 	 * @since 5.1
+	 */
+	/**
+	 * 设置销毁时候的方法 对应@PreDestroy
 	 */
 	void setDestroyMethodName(@Nullable String destroyMethodName);
 

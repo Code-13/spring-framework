@@ -63,13 +63,18 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	/** Determines if the definition needs to be re-merged. */
 	volatile boolean stale;
 
+	// 默认允许启用缓存
 	boolean allowCaching = true;
 
+	// 你的 FactoryMethod 有没有专门设置值【捷径方法】
 	boolean isFactoryMethodUnique;
 
 	@Nullable
 	volatile ResolvableType targetType;
 
+	/**
+	 * 缓存之前确定好的 Bean 实例类型
+	 */
 	/** Package-visible field for caching the determined Class of a given bean definition. */
 	@Nullable
 	volatile Class<?> resolvedTargetType;
@@ -78,6 +83,9 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Boolean isFactoryBean;
 
+	/**
+	 * 缓存之前确定好的创建实例的方法返回的类型
+	 */
 	/** Package-visible field for caching the return type of a generically typed factory method. */
 	@Nullable
 	volatile ResolvableType factoryMethodReturnType;
@@ -86,30 +94,54 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Method factoryMethodToIntrospect;
 
+	/**
+	 * 在读/写和创建实例的方法有关的字段、缓存字段时使用此锁。
+	 */
 	/** Common lock for the four constructor fields below. */
 	final Object constructorArgumentLock = new Object();
 
+	/**
+	 * 缓存之前确定好的创建实例的方法【可能是构造方法、可能是工厂方法】
+	 */
 	/** Package-visible field for caching the resolved constructor or factory method. */
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
+	/**
+	 * 我们有没有缓存创建实例的入参【捷径方法】
+	 */
 	/** Package-visible field that marks the constructor arguments as resolved. */
 	boolean constructorArgumentsResolved = false;
 
+	/**
+	 * 缓存之前确定好的创建实例的入参【可能是构造方法、可能是工厂方法】【这个是完整的一套入参】
+	 */
 	/** Package-visible field for caching fully resolved constructor arguments. */
 	@Nullable
 	Object[] resolvedConstructorArguments;
 
+	/**
+	 * 缓存之前确定好的创建实例的入参【可能是构造方法、可能是工厂方法】【这个是不完整的一套入参，可能少东西】
+	 */
 	/** Package-visible field for caching partly prepared constructor arguments. */
 	@Nullable
 	Object[] preparedConstructorArguments;
 
+	/**
+	 * 在读/写后处理器相关缓存字段时使用此锁
+	 */
 	/** Common lock for the two post-processing fields below. */
 	final Object postProcessingLock = new Object();
 
+	/**
+	 * 标记此 bd 是否被应用过后处理器的钩子【MergedBeanDefinitionPostProcessor】
+	 */
 	/** Package-visible field that indicates MergedBeanDefinitionPostProcessor having been applied. */
 	boolean postProcessed = false;
 
+	/**
+	 * 标记量，表明此 bd 是否要执行创造 bean 前的钩子【用于决定 aop 是否可以织入】
+	 */
 	/** Package-visible field that indicates a before-instantiation post-processor having kicked in. */
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;

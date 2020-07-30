@@ -1676,6 +1676,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @param mbd the corresponding bean definition
 	 */
 	protected boolean isFactoryBean(String beanName, RootBeanDefinition mbd) {
+		//通过名字和bean定义看是否是FactoryBean了
+		//如果定义本身定义了isFactoryBean，那就直接返回结果，否则需要进行类型预测，他会进行反射，看看名字对应的类是否是FactoryBean类型的，如果预测出来的类型是FactoryBean，那就返回true了，否则就false
 		Boolean result = mbd.isFactoryBean;
 		if (result == null) {
 			Class<?> beanType = predictBeanType(beanName, mbd, FactoryBean.class);

@@ -43,12 +43,20 @@ import org.springframework.util.Assert;
 @SuppressWarnings("serial")
 public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implements AnnotatedBeanDefinition {
 
+	/**
+	 * 注解元数据
+	 */
 	private final AnnotationMetadata metadata;
 
+	/**
+	 * 工厂方法元数据
+	 */
 	@Nullable
 	private MethodMetadata factoryMethodMetadata;
 
-
+	/**
+	 * 通过 beanClass 来获取元数据
+	 */
 	/**
 	 * Create a new AnnotatedGenericBeanDefinition for the given bean class.
 	 * @param beanClass the loaded bean class
@@ -58,6 +66,9 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 		this.metadata = AnnotationMetadata.introspect(beanClass);
 	}
 
+	/**
+	 * 从注解元数据获取 beanClass
+	 */
 	/**
 	 * Create a new AnnotatedGenericBeanDefinition for the given annotation metadata,
 	 * allowing for ASM-based processing and avoidance of early loading of the bean class.
@@ -79,6 +90,9 @@ public class AnnotatedGenericBeanDefinition extends GenericBeanDefinition implem
 		this.metadata = metadata;
 	}
 
+	/**
+	 * 从注解元数据与方法元数据创建
+	 */
 	/**
 	 * Create a new AnnotatedGenericBeanDefinition for the given annotation metadata,
 	 * based on an annotated class and a factory method on that class.

@@ -207,6 +207,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * @return the transformed name
 	 */
 	public String canonicalName(String name) {
+		//进行名字的规范化，其实就是取出原始名字，如果是别名就从映射中取原始名，是原始名字直接返回。
 		String canonicalName = name;
 		// Handle aliasing...
 		String resolvedName;
