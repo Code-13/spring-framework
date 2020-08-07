@@ -369,6 +369,7 @@ class ConstructorResolver {
 						ReflectionUtils.getAllDeclaredMethods(factoryClass) : factoryClass.getMethods()));
 		}
 		else {
+			//如果允许非Public的方法，就获取所有申明的方法，包括父类的，否则就是Public的方法，包括父类的，默认是允许的
 			return (mbd.isNonPublicAccessAllowed() ?
 					ReflectionUtils.getAllDeclaredMethods(factoryClass) : factoryClass.getMethods());
 		}

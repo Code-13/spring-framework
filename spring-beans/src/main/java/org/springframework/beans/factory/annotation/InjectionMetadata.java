@@ -233,6 +233,7 @@ public class InjectionMetadata {
 		protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
 				throws Throwable {
 
+			//属性注入
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
@@ -242,6 +243,7 @@ public class InjectionMetadata {
 				if (checkPropertySkipping(pvs)) {
 					return;
 				}
+				//方法注入
 				try {
 					Method method = (Method) this.member;
 					ReflectionUtils.makeAccessible(method);
