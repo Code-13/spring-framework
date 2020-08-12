@@ -642,12 +642,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			}
 		}
 
+		// 存在提前曝光的情况
 		if (earlySingletonExposure) {
+			// 此时获取 singleton 是从二级缓存中拿，缓存的可能是经过提前曝光提前Spring AOP代理的bean
 			Object earlySingletonReference = getSingleton(beanName, false);
 			if (earlySingletonReference != null) {
+				// exposedObject跟bean一样，说明没有被 SmartInstantiationAwareBeanPostProcessor.getEarlyBeanReference处理过
+				// spring内部只有 AOP 代理的实现
+				// 因为exposedObject如果提前代理过，就会跳过Spring AOP代理，所以exposedObject没被改变，也就等于bean了
 				if (exposedObject == bean) {
+					// 将二级缓存中的提前AOP代理的bean赋值给exposedObject，并返回
 					exposedObject = earlySingletonReference;
 				}
+				// 引用都不相等了，也就是现在的bean已经不是当时提前曝光的bean了
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
